@@ -1,0 +1,42 @@
+name: Trigger auto deployment for mini-checkout-app
+
+# When this action will be executed
+on:
+  # Automatically trigger it when detected changes in repo
+  push:
+    branches: 
+      [ main ]
+    paths:
+    - '**'
+    - '.github/workflows/mini-checkout-app-AutoDeployTrigger-a9dfeeea-d704-4ced-9966-936810b7ad89.yml'
+
+  # Allow mannually trigger 
+  workflow_dispatch:
+      
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout to the branch
+        uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.MINICHECKOUTAPP_AZURE_CREDENTIALS }}
+
+      - name: Build and push container image to registry
+        uses: azure/container-apps-deploy-action@v1
+        with:
+          appSourcePath: ${{ github.workspace }} 
+          registryUrl: docker.io
+          registryUsername: ${{ secrets.MINICHECKOUTAPP_REGISTRY_USERNAME }}
+          registryPassword: ${{ secrets.MINICHECKOUTAPP_REGISTRY_PASSWORD }}
+          containerAppName: mini-checkout-app
+          resourceGroup: DefaultResourceGroup-NEU
+          imageToBuild: donprecious/mini-checkout-app:${{ github.sha }}
+          
+
+     
+
