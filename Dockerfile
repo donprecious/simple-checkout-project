@@ -1,9 +1,9 @@
 FROM node:16 AS builder
 WORKDIR /app
 COPY ./package.json ./
-RUN npm install
+RUN yarn install
 COPY . .
-RUN npm run build
+RUN yarn run build
 
 
 # Second Stage : Setup command to run your app using lightweight node image

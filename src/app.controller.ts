@@ -1,7 +1,6 @@
 import { Controller, Get, Inject, OnModuleInit, Query } from "@nestjs/common";
 import { AppService } from "./app.service";
 
-import { ClientGrpc } from "@nestjs/microservices";
 import { firstValueFrom } from "rxjs";
 
 @Controller()
