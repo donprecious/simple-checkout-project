@@ -11,7 +11,7 @@ FROM node:16-alpine
 WORKDIR /app
 COPY --from=builder /app ./
 RUN chmod +x ./run.sh
-EXPOSE 3000
+#EXPOSE 3000
 ENTRYPOINT ["/app/run.sh"]
 
 
