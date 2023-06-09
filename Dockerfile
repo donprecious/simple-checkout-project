@@ -1,23 +1,21 @@
-FROM node:16 AS builder
-WORKDIR /app
-EXPOSE 80
-EXPOSE 443
+# Use an official Node runtime as the base image
+FROM node:14-alpine
 
-COPY ./package.json ./
-RUN yarn install
+# Set the working directory in the container to /app
+WORKDIR /app
+
+# Copy the package.json and package-lock.json files from your local filesystem to the filesystem of the container at the working directory
+COPY package*.json ./
+
+# Install any needed packages specified in package.json
+RUN npm install
+
+# Bundle the app source inside the Docker image
+# If you are building your code for production, run `npm ci --only=production`
 COPY . .
-RUN yarn run build
 
+# Your app binds to port 3000 so you'll use the EXPOSE instruction to have it mapped by the docker daemon
+EXPOSE 3000
 
-# Second Stage : Setup command to run your app using lightweight node image
-FROM node:12-alpine
-WORKDIR /app
-COPY --from=builder /app ./
-COPY package.json .
-
-RUN chmod +x ./run.sh
-
-ENTRYPOINT ["npm run start:prod"]
-
-
-
+# Define the command to run your app using CMD which defines your runtime
+CMD [ "npm", "run", "start" ]
