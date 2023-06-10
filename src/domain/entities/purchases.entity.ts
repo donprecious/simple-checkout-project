@@ -27,10 +27,10 @@ export class Purchase extends SharedEntity {
   @Column()
   currencyCode: string;
 
-  @Column({ type: "enum", enum: currencyType })
+  @Column({ type: "simple-enum", enum: currencyType })
   currencyType: currencyType;
 
-  @Column({ type: "enum", enum: transactionStatusEnum })
+  @Column({ type: "simple-enum", enum: transactionStatusEnum })
   status: transactionStatusEnum;
 
   @Column()

@@ -16,13 +16,16 @@ import {
   GetTransactionQueryModel,
   TransactionModel,
 } from "./model/transactions.model";
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import { Cache } from "cache-manager";
 
 export class TransactionService implements ITransactionService {
   private readonly logger = new Logger(TransactionService.name);
   constructor(
     private dataSource: DataSource,
     @InjectRepository(Transaction)
-    private transactionRepo: Repository<Transaction>
+    private transactionRepo: Repository<Transaction>,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache
   ) {}
 
   async checkout(model: CheckoutModel): Promise<CheckoutResponseModel> {
@@ -79,9 +82,17 @@ export class TransactionService implements ITransactionService {
   async getTransactions(
     model: GetTransactionQueryModel
   ): Promise<TransactionModel[]> {
+    const key = "transactions";
+    const result = await this.cacheManager.get(key);
+    if (result) {
+      return JSON.parse(result);
+    }
+
     const transactions = await this.transactionRepo.find({
       relations: { purchase: true },
     });
-    return transactions as unknown as TransactionModel[];
+    const data = transactions as unknown as TransactionModel[];
+    await this.cacheManager.set(key, JSON.stringify(data), 5000);
+    return data;
   }
 }

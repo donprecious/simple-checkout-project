@@ -12,6 +12,8 @@ async function bootstrap() {
   const httpAdapter = app.get(HttpAdapterHost);
   // app.useGlobalFilters(new AllExceptionsFilter(httpAdapter.httpAdapter));
   app.setGlobalPrefix("api");
+  app.enableCors({ origin: getCorsAllowedUrls() });
+
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
@@ -22,8 +24,8 @@ async function bootstrap() {
   );
   app.useGlobalInterceptors(new LoggerInterceptor());
   const config = new DocumentBuilder()
-    .setTitle("Payment aggregator api")
-    .setDescription("Api for payment aggregator")
+    .setTitle("Api for payment gateway api")
+    .setDescription("Api for payment gateway api")
     .setVersion("1.0")
     .build();
   const document = SwaggerModule.createDocument(app, config);
@@ -34,3 +36,13 @@ async function bootstrap() {
   console.log(`app running on port ${port}`);
 }
 bootstrap();
+
+function getCorsAllowedUrls(): string[] {
+  const corUrl = process.env.CORS_ORIGIN;
+  if (corUrl) {
+    const origin = corUrl.split(",").map((a) => a.trim());
+    console.log("allowed origins", origin);
+    return origin;
+  }
+  return [];
+}
